@@ -22,40 +22,38 @@ SET time_zone = "+00:00";
 --
 
 -- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `producto`
---
-
-CREATE TABLE `producto` (
-  `nombre` text NOT NULL,
-  `precio` int(11) NOT NULL,
-  `stock` int(11) NOT NULL,
-  `categoria` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `producto`
---
-
+-- Base de datos: `supermercado`
 -- --------------------------------------------------------
 
---
--- Estructura de tabla para la tabla `usuario`
---
+-- Estructura de tabla para la tabla `producto`
+CREATE TABLE `producto` (
+  `nombre` VARCHAR(100) NOT NULL,
+  `precio` DECIMAL(10,2) NOT NULL,
+  `stock` INT NOT NULL,
+  `categoria` VARCHAR(100) NOT NULL,
+  PRIMARY KEY (`nombre`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Estructura de tabla para la tabla `usuario`
 CREATE TABLE `usuario` (
-  `nombre` varchar(50) NOT NULL,
-  `apellido` varchar(50) NOT NULL,
-  `dni` varchar(20) NOT NULL,
-  `edad` int(11) NOT NULL,
-  `estado` varchar(20) DEFAULT 'activo',
+  `nombre` VARCHAR(50) NOT NULL,
+  `apellido` VARCHAR(50) NOT NULL,
+  `dni` VARCHAR(20) NOT NULL,
+  `edad` INT NOT NULL,
+  `estado` VARCHAR(20) DEFAULT 'activo',
+  `rol` VARCHAR(20) NOT NULL, -- cliente, trabajador, etc.
   PRIMARY KEY (`dni`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
---
--- Volcado de datos para la tabla `usuario`
---
 
+-- Estructura de tabla para la tabla `ventas`
+CREATE TABLE `ventas` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `producto` VARCHAR(100) NOT NULL,
+  `cantidad` INT NOT NULL,
+  `precio` DECIMAL(10,2) NOT NULL,
+  `fecha` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `cliente` VARCHAR(50)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
