@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 23-03-2026 a las 19:33:06
+-- Tiempo de generación: 23-03-2026 a las 20:03:11
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -28,18 +28,12 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `carrito` (
-  `id_cliente` int(11) NOT NULL,
-  `productos` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `id_carrito` int(11) NOT NULL,
+  `id_cliente` int(11) DEFAULT NULL,
+  `productos` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`productos`)),
+  `total` int(11) DEFAULT 0,
   `ultima_actualizacion` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `carrito`
---
-
-INSERT INTO `carrito` (`id_cliente`, `productos`, `ultima_actualizacion`) VALUES
-(5, '[{\"id_prod\":1,\"cant\":1,\"precio_unitario\":5000,\"precio_total\":5000},{\"id_prod\":3,\"cant\":1,\"precio_unitario\":3000,\"precio_total\":3000},{\"id_prod\":3,\"cant\":1,\"precio_unitario\":3000,\"precio_total\":3000}]', '2026-03-23 03:30:29'),
-(6, '[{\"id_prod\":2,\"precio_total\":15000},{\"id_prod\":2,\"precio_total\":15000}]', '2026-03-23 18:27:54');
 
 -- --------------------------------------------------------
 
@@ -57,9 +51,12 @@ CREATE TABLE `categorias` (
 --
 
 INSERT INTO `categorias` (`id_categoria`, `nombre`) VALUES
-(3, 'Accesorios'),
-(2, 'Calzado'),
-(1, 'Ropa');
+(2, 'Bebidas'),
+(6, 'Carnes'),
+(4, 'Frutas'),
+(3, 'Lacteos'),
+(1, 'Limpieza'),
+(5, 'Verduras');
 
 -- --------------------------------------------------------
 
@@ -84,10 +81,11 @@ CREATE TABLE `clientes` (
 --
 
 INSERT INTO `clientes` (`id_cliente`, `id_rol`, `dni`, `nombre`, `apellido`, `correo`, `contrasena`, `telefono`, `fecha_registro`) VALUES
-(1, 1, '11111111', 'Admin', 'Principal', 'admin@test.com', '1234', NULL, '2026-03-23 01:26:00'),
-(4, 3, '890', 'santi', 'noviodealma', 'carenaalma2@gmail.com', '1234', NULL, '2026-03-23 01:46:29'),
-(5, 3, '789', 'nico', 'cola', 'nicocola', 'nicocola', NULL, '2026-03-23 03:27:05'),
-(6, 3, '666', 'prueba', 'prueba', 'prueba', 'prueba', NULL, '2026-03-23 18:16:13');
+(1, 1, '11111111', 'Admin', 'Principal', 'admin@test.com', '1234', NULL, '2026-03-23 19:02:38'),
+(4, 3, '890', 'santi', 'noviodealma', 'carenaalma2@gmail.com', '1234', NULL, '2026-03-23 19:02:38'),
+(5, 3, '789', 'nico', 'cola', 'nicocola', 'nicocola', NULL, '2026-03-23 19:02:38'),
+(6, 3, '666', 'prueba', 'prueba', 'prueba', 'prueba', NULL, '2026-03-23 19:02:38'),
+(7, 3, '909', 'luisito', 'Monzon', 'mario@gmail.com', 'prueba', NULL, '2026-03-23 19:02:38');
 
 -- --------------------------------------------------------
 
@@ -98,12 +96,12 @@ INSERT INTO `clientes` (`id_cliente`, `id_rol`, `dni`, `nombre`, `apellido`, `co
 CREATE TABLE `direcciones` (
   `id_direccion` int(11) NOT NULL,
   `id_cliente` int(11) NOT NULL,
-  `nombre_direccion` varchar(400) NOT NULL,
-  `numero_direccion` int(11) NOT NULL,
-  `piso_dep` int(11) NOT NULL,
-  `ciudad` varchar(400) NOT NULL,
-  `provincia` varchar(400) NOT NULL,
-  `referencia` varchar(400) NOT NULL
+  `nombre_direccion` varchar(400) DEFAULT NULL,
+  `numero_direccion` int(11) DEFAULT NULL,
+  `piso_dep` int(11) DEFAULT NULL,
+  `ciudad` varchar(400) DEFAULT NULL,
+  `provincia` varchar(400) DEFAULT NULL,
+  `referencia` varchar(400) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -111,7 +109,7 @@ CREATE TABLE `direcciones` (
 --
 
 INSERT INTO `direcciones` (`id_direccion`, `id_cliente`, `nombre_direccion`, `numero_direccion`, `piso_dep`, `ciudad`, `provincia`, `referencia`) VALUES
-(0, 4, 'Thames', 3174, 2, 'Ciudad Autónoma de Buenos Aires', 'Buenos Aires', 'caca');
+(1, 4, 'Thames', 3174, 2, 'CABA', 'Buenos Aires', 'Referencia');
 
 -- --------------------------------------------------------
 
@@ -122,24 +120,22 @@ INSERT INTO `direcciones` (`id_direccion`, `id_cliente`, `nombre_direccion`, `nu
 CREATE TABLE `empleados` (
   `id_empleado` int(11) NOT NULL,
   `id_rol` int(11) DEFAULT 2,
-  `dni` varchar(20) NOT NULL,
-  `nombre` varchar(100) NOT NULL,
-  `apellido` varchar(100) NOT NULL,
-  `correo` varchar(150) NOT NULL,
-  `legajo` varchar(50) NOT NULL,
-  `fecha_contratacion` date NOT NULL,
-  `cargo` varchar(100) NOT NULL,
-  `sueldo_base` decimal(12,2) DEFAULT NULL,
-  `activo` tinyint(1) DEFAULT 1
+  `dni` varchar(20) DEFAULT NULL,
+  `nombre` varchar(100) DEFAULT NULL,
+  `apellido` varchar(100) DEFAULT NULL,
+  `correo` varchar(150) DEFAULT NULL,
+  `fecha_contratacion` date DEFAULT NULL,
+  `cargo` varchar(100) DEFAULT NULL,
+  `sueldo_base` decimal(12,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `empleados`
 --
 
-INSERT INTO `empleados` (`id_empleado`, `id_rol`, `dni`, `nombre`, `apellido`, `correo`, `legajo`, `fecha_contratacion`, `cargo`, `sueldo_base`, `activo`) VALUES
-(1, 2, '22222222', 'Juan', 'Perez', 'cliente@test.com', 'EMP2', '2026-03-22', 'Empleado', 0.00, 1),
-(2, 2, '456', 'Alma Azul Carena', 'a', 'carenaalma2@gmail.com', 'EMP3', '2026-03-22', 'Empleado', 0.00, 1);
+INSERT INTO `empleados` (`id_empleado`, `id_rol`, `dni`, `nombre`, `apellido`, `correo`, `fecha_contratacion`, `cargo`, `sueldo_base`) VALUES
+(1, 2, '22222222', 'Juan', 'Perez', 'empleado@test.com', '2026-03-22', 'Empleado', 0.00),
+(2, 2, '456', 'Alma', 'Azul', 'alma@gmail.com', '2026-03-22', 'Empleado', 0.00);
 
 -- --------------------------------------------------------
 
@@ -149,10 +145,18 @@ INSERT INTO `empleados` (`id_empleado`, `id_rol`, `dni`, `nombre`, `apellido`, `
 
 CREATE TABLE `estado_pedido` (
   `id_estado_pedido` int(11) NOT NULL,
-  `proceso` int(11) NOT NULL,
-  `en camino` int(11) NOT NULL,
-  `entregado` int(11) NOT NULL
+  `nombre` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `estado_pedido`
+--
+
+INSERT INTO `estado_pedido` (`id_estado_pedido`, `nombre`) VALUES
+(1, 'En proceso'),
+(2, 'En camino'),
+(3, 'Entregado'),
+(4, 'Cancelado');
 
 -- --------------------------------------------------------
 
@@ -162,17 +166,17 @@ CREATE TABLE `estado_pedido` (
 
 CREATE TABLE `metododepago` (
   `id_metododepago` int(11) NOT NULL,
-  `id_cliente` int(11) NOT NULL,
-  `nombre` varchar(400) NOT NULL,
-  `Descripcion` varchar(400) NOT NULL
+  `id_cliente` int(11) DEFAULT NULL,
+  `nombre` varchar(400) DEFAULT NULL,
+  `descripcion` varchar(400) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `metododepago`
 --
 
-INSERT INTO `metododepago` (`id_metododepago`, `id_cliente`, `nombre`, `Descripcion`) VALUES
-(0, 4, 'Tarjeta', 'simple');
+INSERT INTO `metododepago` (`id_metododepago`, `id_cliente`, `nombre`, `descripcion`) VALUES
+(1, 4, 'Tarjeta', 'Simple');
 
 -- --------------------------------------------------------
 
@@ -182,22 +186,15 @@ INSERT INTO `metododepago` (`id_metododepago`, `id_cliente`, `nombre`, `Descripc
 
 CREATE TABLE `pedidos` (
   `id_pedido` int(11) NOT NULL,
-  `id_direccion` int(11) NOT NULL,
-  `id_metododepago` int(11) NOT NULL,
-  `id_carrito` int(11) NOT NULL,
-  `costo_envio` int(11) NOT NULL,
-  `total` int(11) NOT NULL,
-  `fecha_pedido` date NOT NULL,
-  `fecha_estimada` date NOT NULL,
-  `estado_pedido` int(11) NOT NULL
+  `id_direccion` int(11) DEFAULT NULL,
+  `id_metododepago` int(11) DEFAULT NULL,
+  `id_carrito` int(11) DEFAULT NULL,
+  `costo_envio` int(11) DEFAULT NULL,
+  `total` int(11) DEFAULT NULL,
+  `fecha_pedido` date DEFAULT NULL,
+  `fecha_estimada` date DEFAULT NULL,
+  `estado_pedido` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `pedidos`
---
-
-INSERT INTO `pedidos` (`id_pedido`, `id_direccion`, `id_metododepago`, `id_carrito`, `costo_envio`, `total`, `fecha_pedido`, `fecha_estimada`, `estado_pedido`) VALUES
-(0, 0, 0, 4, 1000, 15000, '2026-03-23', '2026-03-26', 1);
 
 -- --------------------------------------------------------
 
@@ -211,7 +208,7 @@ CREATE TABLE `productos` (
   `nombre_producto` varchar(200) NOT NULL,
   `descripcion` text DEFAULT NULL,
   `precio` decimal(12,2) NOT NULL,
-  `stock` int(11) NOT NULL DEFAULT 0,
+  `stock` int(11) DEFAULT 0,
   `es_destacado` tinyint(1) DEFAULT 0,
   `etiqueta_especial` varchar(50) DEFAULT NULL,
   `descuento_texto` varchar(100) DEFAULT NULL,
@@ -255,7 +252,8 @@ INSERT INTO `roles` (`id_rol`, `nombre`) VALUES
 -- Indices de la tabla `carrito`
 --
 ALTER TABLE `carrito`
-  ADD PRIMARY KEY (`id_cliente`);
+  ADD PRIMARY KEY (`id_carrito`),
+  ADD UNIQUE KEY `id_cliente` (`id_cliente`);
 
 --
 -- Indices de la tabla `categorias`
@@ -287,7 +285,6 @@ ALTER TABLE `empleados`
   ADD PRIMARY KEY (`id_empleado`),
   ADD UNIQUE KEY `dni` (`dni`),
   ADD UNIQUE KEY `correo` (`correo`),
-  ADD UNIQUE KEY `legajo` (`legajo`),
   ADD KEY `id_rol` (`id_rol`);
 
 --
@@ -301,16 +298,17 @@ ALTER TABLE `estado_pedido`
 --
 ALTER TABLE `metododepago`
   ADD PRIMARY KEY (`id_metododepago`),
-  ADD KEY `id_usuario` (`id_cliente`);
+  ADD KEY `id_cliente` (`id_cliente`);
 
 --
 -- Indices de la tabla `pedidos`
 --
 ALTER TABLE `pedidos`
   ADD PRIMARY KEY (`id_pedido`),
-  ADD KEY `id_metodopago` (`id_metododepago`),
   ADD KEY `id_direccion` (`id_direccion`),
-  ADD KEY `id_carrito` (`id_carrito`);
+  ADD KEY `id_metododepago` (`id_metododepago`),
+  ADD KEY `id_carrito` (`id_carrito`),
+  ADD KEY `estado_pedido` (`estado_pedido`);
 
 --
 -- Indices de la tabla `productos`
@@ -331,22 +329,52 @@ ALTER TABLE `roles`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `carrito`
+--
+ALTER TABLE `carrito`
+  MODIFY `id_carrito` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `categorias`
 --
 ALTER TABLE `categorias`
-  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT de la tabla `direcciones`
+--
+ALTER TABLE `direcciones`
+  MODIFY `id_direccion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `empleados`
 --
 ALTER TABLE `empleados`
   MODIFY `id_empleado` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de la tabla `estado_pedido`
+--
+ALTER TABLE `estado_pedido`
+  MODIFY `id_estado_pedido` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT de la tabla `metododepago`
+--
+ALTER TABLE `metododepago`
+  MODIFY `id_metododepago` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de la tabla `pedidos`
+--
+ALTER TABLE `pedidos`
+  MODIFY `id_pedido` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `productos`
@@ -377,10 +405,31 @@ ALTER TABLE `clientes`
   ADD CONSTRAINT `clientes_ibfk_1` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`);
 
 --
+-- Filtros para la tabla `direcciones`
+--
+ALTER TABLE `direcciones`
+  ADD CONSTRAINT `direcciones_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`) ON DELETE CASCADE;
+
+--
 -- Filtros para la tabla `empleados`
 --
 ALTER TABLE `empleados`
   ADD CONSTRAINT `empleados_ibfk_1` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`);
+
+--
+-- Filtros para la tabla `metododepago`
+--
+ALTER TABLE `metododepago`
+  ADD CONSTRAINT `metododepago_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id_cliente`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `pedidos`
+--
+ALTER TABLE `pedidos`
+  ADD CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`id_direccion`) REFERENCES `direcciones` (`id_direccion`),
+  ADD CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`id_metododepago`) REFERENCES `metododepago` (`id_metododepago`),
+  ADD CONSTRAINT `pedidos_ibfk_3` FOREIGN KEY (`id_carrito`) REFERENCES `carrito` (`id_carrito`),
+  ADD CONSTRAINT `pedidos_ibfk_4` FOREIGN KEY (`estado_pedido`) REFERENCES `estado_pedido` (`id_estado_pedido`);
 
 --
 -- Filtros para la tabla `productos`
