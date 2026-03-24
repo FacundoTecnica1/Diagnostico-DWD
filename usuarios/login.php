@@ -1,32 +1,29 @@
 <?php
 session_start();
-include 'conexion.php';
+include '../conexion.php'; // Agregamos ../ para salir de la carpeta 'usuarios'
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $correo = $_POST['correo'];
+    $contrasena = $_POST['contrasena'];
 
-    $nombre = $_POST['nombre'];
-    $apellido = $_POST['apellido'];
-    $dni = $_POST['dni'];
-
-    $sql = "SELECT * FROM usuario 
-            WHERE nombre='$nombre' 
-            AND apellido='$apellido' 
-            AND dni='$dni'";
+    $sql = "SELECT c.*, r.nombre AS rol_nombre 
+            FROM clientes c 
+            JOIN roles r ON c.id_rol = r.id_rol 
+            WHERE c.correo='$correo' AND c.contrasena='$contrasena'";
 
     $resultado = $conn->query($sql);
 
-    if ($resultado->num_rows > 0) {
+    if ($resultado && $resultado->num_rows > 0) {
+        $usuario = $resultado->fetch_assoc();
+        
+        $_SESSION['usuario_nombre'] = $usuario['nombre'];
+        $_SESSION['usuario_rol'] = strtolower($usuario['rol_nombre']); 
+        $_SESSION['id_cliente'] = $usuario['id_cliente'];
 
-        // Guardamos en sesión
-        $_SESSION['nombre'] = $nombre;
-        $_SESSION['apellido'] = $apellido;
-        $_SESSION['dni'] = $dni;
-
-        header("Location: index.php");
+        header("Location: ../index.php"); // Volvemos a la raíz
         exit(); 
-
     } else {
-        echo "Datos incorrectos.";
+        echo "<script>alert('Datos incorrectos'); window.location='login.html';</script>";
     }
 }
 ?>

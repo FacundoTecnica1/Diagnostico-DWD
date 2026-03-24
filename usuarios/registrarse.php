@@ -1,26 +1,26 @@
 <?php
-session_start(); // Siempre al principio
-include 'conexion.php';
+session_start();
+include '../conexion.php'; // Agregamos ../ para salir de la carpeta 'usuarios'
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nombre = $_POST['nombre'];
     $apellido = $_POST['apellido'];
     $dni = $_POST['dni'];
-    $edad = $_POST['edad'];
+    $correo = $_POST['correo'];
+    $contrasena = $_POST['contrasena'];
+    $telefono = $_POST['telefono'];
 
-    // Insertamos al usuario (Por defecto el estado será 'activo' según tu tabla)
-    $sql = "INSERT INTO usuario (nombre, apellido, dni, edad) 
-            VALUES ('$nombre', '$apellido', '$dni', '$edad')";
+    // Insertamos en la tabla 'clientes' (Rol 3 = Cliente)
+    $sql = "INSERT INTO clientes (id_rol, dni, nombre, apellido, correo, contrasena, telefono) 
+            VALUES (3, '$dni', '$nombre', '$apellido', '$correo', '$contrasena', '$telefono')";
 
     if ($conn->query($sql) === TRUE) {
-        // GUARDAMOS EL NOMBRE EN LA SESIÓN AQUÍ
         $_SESSION['usuario_nombre'] = $nombre; 
-        
-        // Redirigimos
-        header("Location: index.php#inicio");
+        $_SESSION['usuario_rol'] = 'cliente';
+        header("Location: ../index.php"); // Volvemos a la raíz para el index
         exit();
     } else {
-        echo "Error: " . $conn->error;
+        echo "Error al registrar: " . $conn->error;
     }
 }
 ?>
