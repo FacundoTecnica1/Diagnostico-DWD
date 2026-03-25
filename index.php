@@ -109,6 +109,13 @@ include 'conexion.php'; // Asegúrate de que este archivo tenga la conexión a l
                     <li class="nav-item ms-lg-2"><a class="btn btn-light rounded-pill px-4 fw-bold text-success" href="usuarios/login.html">Login</a></li>
                 <?php else: ?>
                     <li class="nav-item px-3 text-white small">Hola, <b><?php echo $_SESSION['usuario_nombre']; ?></b></li>
+                    <?php if($_SESSION['usuario_rol'] === 'admin'): ?>
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-warning rounded-pill px-4 fw-bold text-dark me-2" href="dashboardadmin.php">
+                            <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <?php endif; ?>
                     <li class="nav-item"><a class="btn btn-outline-light btn-sm rounded-pill" href="usuarios/logout.php">Cerrar Sesión</a></li>
                 <?php endif; ?>
             </ul>
@@ -128,124 +135,58 @@ include 'conexion.php'; // Asegúrate de que este archivo tenga la conexión a l
     $busqueda = isset($_GET['buscar']) ? $_GET['buscar'] : '';
 
     // --- ROL: CLIENTE O VISITANTE ---
-    if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] === 'cliente') {
-        echo '
-        <div class="row mb-4 align-items-center">
-            <div class="col-md-6">
-                <h2 class="fw-bold m-0">Catálogo de Productos</h2>
-            </div>
-            <div class="col-md-6">
-                <form class="d-flex shadow-sm rounded-pill bg-white p-1" method="GET">
-                    <input class="form-control border-0 rounded-pill px-3" type="search" name="buscar" placeholder="¿Qué buscas?" value="'.$busqueda.'">
-                    <button class="btn btn-success rounded-pill px-4" type="submit"><i class="bi bi-search"></i></button>
-                </form>
-            </div>
-        </div>';
+    echo '
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h2 class="fw-bold m-0">Catálogo de Productos</h2>
+        </div>
+        <div class="col-md-6">
+            <form class="d-flex shadow-sm rounded-pill bg-white p-1" method="GET">
+                <input class="form-control border-0 rounded-pill px-3" type="search" name="buscar" placeholder="¿Qué buscas?" value="'.$busqueda.'">
+                <button class="btn btn-success rounded-pill px-4" type="submit"><i class="bi bi-search"></i></button>
+            </form>
+        </div>
+    </div>';
 
-        // Consulta corregida para la tabla 'productos' y columna 'nombre_producto'
-        $sql = "SELECT p.*, c.nombre as categoria_nombre 
-                FROM productos p 
-                LEFT JOIN categorias c ON p.id_categoria = c.id_categoria 
-                WHERE p.nombre_producto LIKE '%$busqueda%'";
-        $res = $conn->query($sql);
+    $sql = "SELECT p.*, c.nombre as categoria_nombre 
+            FROM productos p 
+            LEFT JOIN categorias c ON p.id_categoria = c.id_categoria 
+            WHERE p.nombre_producto LIKE '%$busqueda%'";
+    $res = $conn->query($sql);
 
-        echo '<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">';
-        if ($res && $res->num_rows > 0) {
-            while ($f = $res->fetch_assoc()) {
-                echo '
-                <div class="col">
-                    <div class="card h-100 card-producto shadow-sm">
-                        <div class="card-img-container">
-                            <i class="bi bi-box2-fill text-success opacity-25" style="font-size: 4rem;"></i>
-                        </div>
-                        <div class="card-body d-flex flex-column pt-0">
-                            <span class="badge bg-light text-success border border-success mb-2 align-self-start">'.htmlspecialchars($f['categoria_nombre']).'</span>
-                            <h5 class="card-title fw-bold">'.htmlspecialchars($f['nombre_producto']).'</h5>
-                            <p class="text-muted small mb-3">Stock: '.htmlspecialchars($f['stock']).' unidades</p>
-                            
-                            <div class="mt-auto">
-                                <p class="precio-grande mb-3">$'.htmlspecialchars($f['precio']).'</p>
-                                <form action="comprar.php" method="POST">
-                                    <input type="hidden" name="id_producto" value="'.$f['id_producto'].'">
-                                    <div class="input-group mb-2">
-                                        <span class="input-group-text bg-white border-end-0">Cant.</span>
-                                        <input type="number" name="cantidad" value="1" min="1" max="'.$f['stock'].'" class="form-control border-start-0 text-center">
-                                    </div>
-                                    <button type="submit" class="btn btn-agregar w-100">🛒 AGREGAR</button>
-                                </form>
-                            </div>
+    echo '<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">';
+    if ($res && $res->num_rows > 0) {
+        while ($f = $res->fetch_assoc()) {
+            echo '
+            <div class="col">
+                <div class="card h-100 card-producto shadow-sm">
+                    <div class="card-img-container">
+                        <i class="bi bi-box2-fill text-success opacity-25" style="font-size: 4rem;"></i>
+                    </div>
+                    <div class="card-body d-flex flex-column pt-0">
+                        <span class="badge bg-light text-success border border-success mb-2 align-self-start">'.htmlspecialchars($f['categoria_nombre']).'</span>
+                        <h5 class="card-title fw-bold">'.htmlspecialchars($f['nombre_producto']).'</h5>
+                        <p class="text-muted small mb-3">Stock: '.htmlspecialchars($f['stock']).' unidades</p>
+                        
+                        <div class="mt-auto">
+                            <p class="precio-grande mb-3">$'.htmlspecialchars($f['precio']).'</p>
+                            <form action="comprar.php" method="POST">
+                                <input type="hidden" name="id_producto" value="'.$f['id_producto'].'">
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text bg-white border-end-0">Cant.</span>
+                                    <input type="number" name="cantidad" value="1" min="1" max="'.$f['stock'].'" class="form-control border-start-0 text-center">
+                                </div>
+                                <button type="submit" class="btn btn-agregar w-100">🛒 AGREGAR</button>
+                            </form>
                         </div>
                     </div>
-                </div>';
-            }
-        } else {
-            echo '<p class="text-center">No se encontraron productos.</p>';
+                </div>
+            </div>';
         }
-        echo '</div>';
+    } else {
+        echo '<p class="text-center">No se encontraron productos.</p>';
     }
-
-    // --- ROL: TRABAJADOR O ADMIN ---
-    elseif ($_SESSION['usuario_rol'] === 'empleado' || $_SESSION['usuario_rol'] === 'admin') {
-        echo '
-        <div class="panel-gestion shadow-sm border mt-4">
-            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-                <h2 class="fw-bold text-success m-0"><i class="bi bi-clipboard-data me-2"></i>Inventario</h2>
-                <a href="#agregar" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm">+ Nuevo Producto</a>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light text-secondary text-uppercase small">
-                        <tr>
-                            <th>Producto</th><th>Precio</th><th>Stock</th><th class="text-end">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>';
-        
-        $sql = "SELECT * FROM productos WHERE nombre_producto LIKE '%$busqueda%'";
-        $res = $conn->query($sql);
-        
-        if ($res) {
-            while ($f = $res->fetch_assoc()) {
-                echo "<tr>
-                        <td class='fw-bold'>{$f['nombre_producto']}</td>
-                        <td class='fw-bold text-success'>\${$f['precio']}</td>
-                        <td><span class='badge bg-success bg-opacity-10 text-success fw-bold p-2'>{$f['stock']} unid.</span></td>
-                        <td class='text-end'>
-                            <a href='editar.php?id={$f['id_producto']}' class='btn btn-sm btn-outline-primary rounded-pill px-3 me-1'>Editar</a>
-                            <a href='eliminar.php?id={$f['id_producto']}' class='btn btn-sm btn-outline-danger rounded-pill px-3' onclick='return confirm(\"¿Eliminar?\")'>Borrar</a>
-                        </td>
-                      </tr>";
-            }
-        }
-        echo '</tbody></table></div></div>';
-
-        echo '
-        <div id="agregar" class="panel-gestion mt-5 border border-success border-opacity-25">
-            <h3 class="fw-bold mb-4"><i class="bi bi-plus-circle me-2 text-success"></i>Cargar Nuevo Producto</h3>
-            <form class="row g-3" action="anadirproducto.php" method="POST">
-                <div class="col-md-6">
-                    <label class="form-label fw-bold small text-muted text-uppercase">Nombre</label>
-                    <input type="text" name="nombre_producto" class="form-control rounded-3" required>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label fw-bold small text-muted text-uppercase">Precio ($)</label>
-                    <input type="number" name="precio" step="0.01" class="form-control rounded-3" required>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label fw-bold small text-muted text-uppercase">Stock</label>
-                    <input type="number" name="stock" class="form-control rounded-3" required>
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label fw-bold small text-muted text-uppercase">ID Categoría</label>
-                    <input type="number" name="id_categoria" class="form-control rounded-3" required>
-                </div>
-                <div class="col-12 text-end">
-                    <button type="submit" class="btn btn-success btn-lg px-5 mt-2 rounded-pill fw-bold">GUARDAR</button>
-                </div>
-            </form>
-        </div>';
-    }
+    echo '</div>';
     ?>
 </main>
 

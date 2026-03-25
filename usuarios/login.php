@@ -20,7 +20,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['usuario_rol'] = strtolower($usuario['rol_nombre']); 
         $_SESSION['id_cliente'] = $usuario['id_cliente'];
 
-        header("Location: ../index.php"); // Volvemos a la raíz
+        // Redirigir según rol
+        if ($_SESSION['usuario_rol'] === 'admin') {
+            header("Location: ../dashboardadmin.php");
+        } else {
+            header("Location: ../index.php");
+        }
         exit(); 
     } else {
         echo "<script>alert('Datos incorrectos'); window.location='login.html';</script>";
