@@ -708,7 +708,7 @@ h1,h2,h3,h4,h5,h6 { font-family: 'Syne', sans-serif; }
     <div class="sidebar-brand">
         <div class="brand-icon"><i class="bi bi-shop-window"></i></div>
         <div>
-            <div class="brand-text">DIAGNOSTCO</div>
+            <div class="brand-text">supermecado</div>
             <div class="brand-sub">Panel Admin</div>
         </div>
     </div>
@@ -729,7 +729,7 @@ h1,h2,h3,h4,h5,h6 { font-family: 'Syne', sans-serif; }
 
         <div class="nav-label">Sistema</div>
         <a class="nav-item" href="index.php">
-            <i class="bi bi-arrow-left-circle"></i> Volver al sitio
+            <i class="bi bi-arrow-left-circle"></i> Volver al inicio
         </a>
         <a class="nav-item" href="usuarios/logout.php">
             <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
@@ -848,7 +848,7 @@ h1,h2,h3,h4,h5,h6 { font-family: 'Syne', sans-serif; }
                     </button>
                 </div>
                 <table class="table">
-                    <thead><tr><th>Nombre</th><th>Cargo</th><th>Rol</th><th>Sueldo base</th></tr></thead>
+                    <thead><tr><th>Nombre</th><th>Cargo</th><th>Rol</th><th>Sueldo</th></tr></thead>
                     <tbody>
                     <?php
                     $qe = $conn->query("SELECT e.*, r.nombre as rol_nombre FROM empleados e LEFT JOIN roles r ON e.id_rol=r.id_rol LIMIT 5");
